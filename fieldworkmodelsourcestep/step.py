@@ -86,6 +86,8 @@ class fieldworkmodelsourceStep(WorkflowStepMountPoint):
             path = self._config['path']
 
         self._GF = geometric_field.load_geometric_field(gfFilename, ensFilename, meshFilename, path=path)
+        print 'GF name:', self._GF.name
+
         self._doneExecution()
 
     def setPortData(self, index, dataIn):
@@ -96,11 +98,11 @@ class fieldworkmodelsourceStep(WorkflowStepMountPoint):
         '''
 
         if index == 0:
-            self._GFFilenames = dataIn # String
+            self._GFFilename = dataIn # String
         elif index == 1:
-            self._ensFilenames = dataIn # String
+            self._ensFilename = dataIn # String
         elif index == 2:
-            self._meshFilenames = dataIn # String
+            self._meshFilename = dataIn # String
         else:
             self._path = dataIn
 
