@@ -14,8 +14,7 @@ from fieldwork.field import geometric_field
 
 class fieldworkmodelsourceStep(WorkflowStepMountPoint):
     '''
-    Skeleton step which is intended to be a helpful starting point
-    for new steps.
+    Step for loading a fieldwork model from disk.
     '''
 
     def __init__(self, location):
