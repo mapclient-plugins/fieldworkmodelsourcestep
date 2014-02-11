@@ -12,13 +12,13 @@ from fieldworkmodelsourcestep.configuredialog import ConfigureDialog
 
 from fieldwork.field import geometric_field
 
-class fieldworkmodelsourceStep(WorkflowStepMountPoint):
+class FieldworkModelSourceStep(WorkflowStepMountPoint):
     '''
     Step for loading a fieldwork model from disk.
     '''
 
     def __init__(self, location):
-        super(fieldworkmodelsourceStep, self).__init__('Fieldwork Model Source', location)
+        super(FieldworkModelSourceStep, self).__init__('Fieldwork Model Source', location)
         self._configured = False # A step cannot be executed until it has been configured.
         self._category = 'Input'
         # Add any other initialisation code here:
