@@ -7,8 +7,8 @@ import os
 from PySide import QtGui
 from PySide import QtCore
 
-from mountpoints.workflowstep import WorkflowStepMountPoint
-from fieldworkmodelsourcestep.configuredialog import ConfigureDialog
+from mapclient.mountpoints.workflowstep import WorkflowStepMountPoint
+from mapclientplugins.fieldworkmodelsourcestep.configuredialog import ConfigureDialog
 
 from fieldwork.field import geometric_field
 
