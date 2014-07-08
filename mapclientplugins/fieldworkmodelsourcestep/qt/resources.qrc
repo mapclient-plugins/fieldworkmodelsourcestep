@@ -1,0 +1,6 @@
+
+<RCC>
+  <qresource prefix="fieldworkmodelsourcestep">
+    <file>images/fieldworkmodelsourceicon.png</file>
+  </qresource>
+</RCC>
