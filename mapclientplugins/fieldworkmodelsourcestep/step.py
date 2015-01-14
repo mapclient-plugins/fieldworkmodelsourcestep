@@ -86,7 +86,7 @@ class FieldworkModelSourceStep(WorkflowStepMountPoint):
             path = self._config['path']
 
         self._GF = geometric_field.load_geometric_field(gfFilename, ensFilename, meshFilename, path=path)
-        print 'GF name:', self._GF.name
+        print('GF name:', self._GF.name)
 
         self._doneExecution()
 

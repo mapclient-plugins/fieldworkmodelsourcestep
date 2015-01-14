@@ -19,5 +19,8 @@ This file is part of MAP Client. (http://launchpad.net/mapclient)
 """
 __version__ = '0.1.0'
 __author__ = 'Ju Zhang'
+__stepname__ = 'Fieldwork Model Source'
+__location__ = 'https://github.com/mapclient-plugins/fieldworkmodelsourcestep/archive/master.zip'
+
 from mapclientplugins.fieldworkmodelsourcestep import step
 import mapclientplugins.fieldworkmodelsourcestep.resources_rc
