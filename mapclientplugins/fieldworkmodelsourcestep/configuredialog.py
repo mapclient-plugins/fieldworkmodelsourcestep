@@ -1,11 +1,11 @@
 
-
+import os
 from PySide import QtGui
-from mapclientplugins.fieldworkmodelsourcestep.ui_configuredialog import Ui_ConfigureDialog
+from mapclientplugins.fieldworkmodelsourcestep.ui_configuredialog import Ui_Dialog
 from PySide.QtGui import QDialog, QFileDialog, QDialogButtonBox
 
 INVALID_STYLE_SHEET = 'background-color: rgba(239, 0, 0, 50)'
-DEFAULT_STYLE_SHEET = ''
+DEFAULT_STYLE_SHEET = 'background-color: rgba(255, 255, 255, 50)'
 
 class ConfigureDialog(QtGui.QDialog):
     '''
@@ -18,13 +18,17 @@ class ConfigureDialog(QtGui.QDialog):
         '''
         QtGui.QDialog.__init__(self, parent)
         
-        self._ui = Ui_ConfigureDialog()
+        self._ui = Ui_Dialog()
         self._ui.setupUi(self)
 
         # Keep track of the previous identifier so that we can track changes
         # and know how many occurrences of the current identifier there should
         # be.
         self._previousIdentifier = ''
+        self._previousGFLoc = ''
+        self._previousEnsLoc = ''
+        self._previousMeshLoc = ''
+        self._previousPathLoc = ''
         # Set a place holder for a callable that will get set from the step.
         # We will use this method to decide whether the identifier is unique.
         self.identifierOccursCount = None
@@ -32,7 +36,15 @@ class ConfigureDialog(QtGui.QDialog):
         self._makeConnections()
 
     def _makeConnections(self):
-        self._ui.lineEdit0.textChanged.connect(self.validate)
+        self._ui.idLineEdit.textChanged.connect(self.validate)
+        self._ui.gfLocButton.clicked.connect(self._gfLocClicked)
+        self._ui.gfLocLineEdit.textChanged.connect(self._gfLocEdited)
+        self._ui.ensLocButton.clicked.connect(self._ensLocClicked)
+        self._ui.ensLocLineEdit.textChanged.connect(self._ensLocEdited)
+        self._ui.meshLocButton.clicked.connect(self._meshLocClicked)
+        self._ui.meshLocLineEdit.textChanged.connect(self._meshLocEdited)
+        self._ui.pathLocButton.clicked.connect(self._pathLocClicked)
+        self._ui.pathLocLineEdit.textChanged.connect(self._pathLocEdited)
 
     def accept(self):
         '''
@@ -56,13 +68,40 @@ class ConfigureDialog(QtGui.QDialog):
         '''
         # Determine if the current identifier is unique throughout the workflow
         # The identifierOccursCount method is part of the interface to the workflow framework.
-        value = self.identifierOccursCount(self._ui.lineEdit0.text())
-        valid = (value == 0) or (value == 1 and self._previousIdentifier == self._ui.lineEdit0.text())
-        if valid:
-            self._ui.lineEdit0.setStyleSheet(DEFAULT_STYLE_SHEET)
+        idValue = self.identifierOccursCount(self._ui.idLineEdit.text())
+        idValid = (idValue == 0) or (idValue == 1 and self._previousIdentifier == self._ui.idLineEdit.text())
+        if idValid:
+            self._ui.idLineEdit.setStyleSheet(DEFAULT_STYLE_SHEET)
         else:
-            self._ui.lineEdit0.setStyleSheet(INVALID_STYLE_SHEET)
+            self._ui.idLineEdit.setStyleSheet(INVALID_STYLE_SHEET)
 
+        gfLocValid = len(self._ui.gfLocLineEdit.text())>0
+        if gfLocValid:
+            self._ui.gfLocLineEdit.setStyleSheet(DEFAULT_STYLE_SHEET)
+        else:
+            self._ui.gfLocLineEdit.setStyleSheet(INVALID_STYLE_SHEET)
+
+        ensLocValid = len(self._ui.ensLocLineEdit.text())>0
+        if ensLocValid:
+            self._ui.ensLocLineEdit.setStyleSheet(DEFAULT_STYLE_SHEET)
+        else:
+            self._ui.ensLocLineEdit.setStyleSheet(INVALID_STYLE_SHEET)
+
+        meshLocValid = len(self._ui.meshLocLineEdit.text())>0
+        if meshLocValid:
+            self._ui.meshLocLineEdit.setStyleSheet(DEFAULT_STYLE_SHEET)
+        else:
+            self._ui.meshLocLineEdit.setStyleSheet(INVALID_STYLE_SHEET)
+
+        pathLocValid = os.path.exists(self._ui.pathLocLineEdit.text())
+        if pathLocValid:
+            print('ding')
+            self._ui.pathLocLineEdit.setStyleSheet(DEFAULT_STYLE_SHEET)
+        else:
+            self._ui.pathLocLineEdit.setStyleSheet(INVALID_STYLE_SHEET)
+
+        valid = idValid and gfLocValid and ensLocValid and meshLocValid and pathLocValid
+        print('DONG: {} {} {} {} {} {}'.format(idValid, gfLocValid, ensLocValid, meshLocValid, pathLocValid, valid))
         self._ui.buttonBox.button(QDialogButtonBox.Ok).setEnabled(valid)
 
         return valid
@@ -73,13 +112,17 @@ class ConfigureDialog(QtGui.QDialog):
         set the _previousIdentifier value so that we can check uniqueness of the
         identifier over the whole of the workflow.
         '''
-        self._previousIdentifier = self._ui.lineEdit0.text()
+        self._previousIdentifier = self._ui.idLineEdit.text()
+        self._previousGFLoc = self._ui.gfLocLineEdit.text()
+        self._previousEnsLoc = self._ui.ensLocLineEdit.text()
+        self._previousMeshLoc = self._ui.meshLocLineEdit.text()
+        self._previousPathLoc = self._ui.pathLocLineEdit.text()
         config = {}
-        config['identifier'] = self._ui.lineEdit0.text()
-        config['GF Filename'] = self._ui.lineEdit1.text()
-        config['ensemble filename'] = self._ui.lineEdit2.text()
-        config['mesh filename'] = self._ui.lineEdit3.text()
-        config['path'] = self._ui.lineEdit4.text()
+        config['identifier'] = self._ui.idLineEdit.text()
+        config['GF Filename'] = self._ui.gfLocLineEdit.text()
+        config['ensemble filename'] = self._ui.ensLocLineEdit.text()
+        config['mesh filename'] = self._ui.meshLocLineEdit.text()
+        config['path'] = self._ui.pathLocLineEdit.text()
         return config
 
     def setConfig(self, config):
@@ -89,9 +132,48 @@ class ConfigureDialog(QtGui.QDialog):
         identifier over the whole of the workflow.
         '''
         self._previousIdentifier = config['identifier']
-        self._ui.lineEdit0.setText(config['identifier'])
-        self._ui.lineEdit1.setText(config['GF Filename'])
-        self._ui.lineEdit2.setText(config['ensemble filename'])
-        self._ui.lineEdit3.setText(config['mesh filename'])
-        self._ui.lineEdit4.setText(config['path'])
+        self._previousGFLoc = config['GF Filename']
+        self._previousEnsLoc = config['ensemble filename']
+        self._previousMeshLoc = config['mesh filename']
+        self._previousPathLoc = config['path']
+        self._ui.idLineEdit.setText(config['identifier'])
+        self._ui.gfLocLineEdit.setText(config['GF Filename'])
+        self._ui.ensLocLineEdit.setText(config['ensemble filename'])
+        self._ui.meshLocLineEdit.setText(config['mesh filename'])
+        self._ui.pathLocLineEdit.setText(config['path'])
 
+    def _gfLocClicked(self):
+        location = QtGui.QFileDialog.getOpenFileName(self, 'Select File Location', self._previousGFLoc)
+        if location[0]:
+            self._previousGFLoc = location[0]
+            self._ui.gfLocLineEdit.setText(location[0])
+
+    def _gfLocEdited(self):
+        self.validate()
+
+    def _ensLocClicked(self):
+        location = QtGui.QFileDialog.getOpenFileName(self, 'Select File Location', self._previousEnsLoc)
+        if location[0]:
+            self._previousEnsLoc = location[0]
+            self._ui.ensLocLineEdit.setText(location[0])
+
+    def _ensLocEdited(self):
+        self.validate()
+
+    def _meshLocClicked(self):
+        location = QtGui.QFileDialog.getOpenFileName(self, 'Select File Location', self._previousMeshLoc)
+        if location[0]:
+            self._previousMeshLoc = location[0]
+            self._ui.meshLocLineEdit.setText(location[0])
+
+    def _meshLocEdited(self):
+        self.validate()
+
+    def _pathLocClicked(self):
+        location = QtGui.QFileDialog.getExistingDirectory(self, 'Select Path Folder', self._previousPathLoc)
+        if location:
+            self._previousPathLoc = location
+            self._ui.pathLocLineEdit.setText(location)
+
+    def _pathLocEdited(self):
+        self.validate()
