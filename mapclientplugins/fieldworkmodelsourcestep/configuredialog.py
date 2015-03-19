@@ -75,6 +75,10 @@ class ConfigureDialog(QtGui.QDialog):
         else:
             self._ui.idLineEdit.setStyleSheet(INVALID_STYLE_SHEET)
 
+        # ok button can be pressed as long as id is okay, rest of configs
+        # don't have to be valid
+        self._ui.buttonBox.button(QDialogButtonBox.Ok).setEnabled(idValid)
+
         gfLocValid = len(self._ui.gfLocLineEdit.text())>0
         if gfLocValid:
             self._ui.gfLocLineEdit.setStyleSheet(DEFAULT_STYLE_SHEET)
@@ -93,16 +97,17 @@ class ConfigureDialog(QtGui.QDialog):
         else:
             self._ui.meshLocLineEdit.setStyleSheet(INVALID_STYLE_SHEET)
 
-        pathLocValid = os.path.exists(self._ui.pathLocLineEdit.text())
+        if len(self._ui.pathLocLineEdit.text())>0:
+            pathLocValid = os.path.exists(self._ui.pathLocLineEdit.text())
+        else:
+            pathLocValid = True
         if pathLocValid:
-            print('ding')
             self._ui.pathLocLineEdit.setStyleSheet(DEFAULT_STYLE_SHEET)
         else:
             self._ui.pathLocLineEdit.setStyleSheet(INVALID_STYLE_SHEET)
 
         valid = idValid and gfLocValid and ensLocValid and meshLocValid and pathLocValid
-        print('DONG: {} {} {} {} {} {}'.format(idValid, gfLocValid, ensLocValid, meshLocValid, pathLocValid, valid))
-        self._ui.buttonBox.button(QDialogButtonBox.Ok).setEnabled(valid)
+        # self._ui.buttonBox.button(QDialogButtonBox.Ok).setEnabled(valid)
 
         return valid
 
