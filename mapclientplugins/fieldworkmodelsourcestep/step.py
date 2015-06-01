@@ -20,7 +20,7 @@ class FieldworkModelSourceStep(WorkflowStepMountPoint):
     def __init__(self, location):
         super(FieldworkModelSourceStep, self).__init__('Fieldwork Model Source', location)
         self._configured = False # A step cannot be executed until it has been configured.
-        self._category = 'Input'
+        self._category = 'Source'
         # Add any other initialisation code here:
         self._icon = QtGui.QImage(':/fieldworkmodelsourcestep/images/fieldworkmodelsourceicon.png')
         # Ports:
