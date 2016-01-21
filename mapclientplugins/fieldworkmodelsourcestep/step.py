@@ -10,7 +10,7 @@ from PySide import QtGui
 from mapclient.mountpoints.workflowstep import WorkflowStepMountPoint
 from mapclientplugins.fieldworkmodelsourcestep.configuredialog import ConfigureDialog
 
-from fieldwork.field import geometric_field
+from gias2.fieldwork.field import geometric_field
 
 class FieldworkModelSourceStep(WorkflowStepMountPoint):
     '''
