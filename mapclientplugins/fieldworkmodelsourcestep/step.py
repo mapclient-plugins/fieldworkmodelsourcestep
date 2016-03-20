@@ -2,15 +2,14 @@
 '''
 MAP Client Plugin Step
 '''
-import os
-
+import json
+import os.path
 from PySide import QtGui
-from PySide import QtCore
 
 from mapclient.mountpoints.workflowstep import WorkflowStepMountPoint
 from mapclientplugins.fieldworkmodelsourcestep.configuredialog import ConfigureDialog
 
-from fieldwork.field import geometric_field
+from gias2.fieldwork.field import geometric_field
 
 class FieldworkModelSourceStep(WorkflowStepMountPoint):
     '''
@@ -59,31 +58,31 @@ class FieldworkModelSourceStep(WorkflowStepMountPoint):
         may be connected up to a button in a widget for example.
         '''
         # Put your execute step code here before calling the '_doneExecution' method.
-        if self._GFFilename!=None:
+        if self._GFFilename is not None:
             gfFilename = self._GFFilename
         else:
-            gfFilename = self._config['GF Filename']
+            gfFilename = os.path.join(self._location, self._config['GF Filename'])
 
-        if self._ensFilename!=None:
+        if self._ensFilename is not None:
             ensFilename = self._ensFilename
-        elif self._config['ensemble filename']==None:
+        elif self._config['ensemble filename'] is None:
             ensFilename = None
         else:
-            ensFilename = self._config['ensemble filename']
+            ensFilename = os.path.join(self._location, self._config['ensemble filename'])
 
-        if self._meshFilename!=None:
+        if self._meshFilename is not None:
             meshFilename = self._meshFilename
-        elif self._config['mesh filename']==None:
+        elif self._config['mesh filename'] is None:
             meshFilename = None
         else:
-            meshFilename = self._config['mesh filename']
+            meshFilename = os.path.join(self._location, self._config['mesh filename'])
 
-        if self._path!=None:
+        if self._path is not None:
             path = self._path
-        elif self._config['path']==None:
+        elif self._config['path'] is None:
             path = ''
         else:
-            path = self._config['path']
+            path = os.path.join(self._location, self._config['path'])
 
         self._GF = geometric_field.load_geometric_field(gfFilename, ensFilename, meshFilename, path=path)
         print('GF name:', self._GF.name)
@@ -122,7 +121,8 @@ class FieldworkModelSourceStep(WorkflowStepMountPoint):
         then set:
             self._configured = True
         '''
-        dlg = ConfigureDialog()
+        dlg = ConfigureDialog(QtGui.QApplication.activeWindow().currentWidget())
+        dlg.setWorkflowLocation(self._location)
         dlg.identifierOccursCount = self._identifierOccursCount
         dlg.setConfig(self._config)
         dlg.validate()
@@ -146,7 +146,7 @@ class FieldworkModelSourceStep(WorkflowStepMountPoint):
         '''
         self._config['identifier'] = identifier
 
-    def serialize(self, location):
+    def serialize(self):
         '''
         Add code to serialize this step to disk.  The filename should
         use the step identifier (received from getIdentifier()) to keep it
@@ -154,35 +154,19 @@ class FieldworkModelSourceStep(WorkflowStepMountPoint):
         disk is:
             filename = getIdentifier() + '.conf'
         '''
-        configuration_file = os.path.join(location, self.getIdentifier() + '.conf')
-        conf = QtCore.QSettings(configuration_file, QtCore.QSettings.IniFormat)
-        conf.beginGroup('config')
-        conf.setValue('identifier', self._config['identifier'])
-        conf.setValue('GF Filename', self._config['GF Filename'])
-        conf.setValue('ensemble filename', self._config['ensemble filename'])
-        conf.setValue('mesh filename', self._config['mesh filename'])
-        conf.setValue('path', self._config['path'])
-        conf.endGroup()
+        return json.dumps(self._config, default=lambda o: o.__dict__, sort_keys=True, indent=4)
 
-
-    def deserialize(self, location):
+    def deserialize(self, string):
         '''
         Add code to deserialize this step from disk.  As with the serialize 
         method the filename should use the step identifier.  Obviously the 
         filename used here should be the same as the one used by the
         serialize method.
         '''
-        configuration_file = os.path.join(location, self.getIdentifier() + '.conf')
-        conf = QtCore.QSettings(configuration_file, QtCore.QSettings.IniFormat)
-        conf.beginGroup('config')
-        self._config['identifier'] = conf.value('identifier', '')
-        self._config['GF Filename'] = conf.value('GF Filename', '')
-        self._config['ensemble filename'] = conf.value('ensemble filename', '')
-        self._config['mesh filename'] = conf.value('mesh filename', '')
-        self._config['path'] = conf.value('path', '')
-        conf.endGroup()
+        self._config.update(json.loads(string))
 
         d = ConfigureDialog()
+        d.setWorkflowLocation(self._location)
         d.identifierOccursCount = self._identifierOccursCount
         d.setConfig(self._config)
         self._configured = d.validate()

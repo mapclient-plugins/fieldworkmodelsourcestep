@@ -21,6 +21,7 @@ class ConfigureDialog(QtGui.QDialog):
         self._ui = Ui_Dialog()
         self._ui.setupUi(self)
 
+        self._workflow_location = None
         # Keep track of the previous identifier so that we can track changes
         # and know how many occurrences of the current identifier there should
         # be.
@@ -45,6 +46,9 @@ class ConfigureDialog(QtGui.QDialog):
         self._ui.meshLocLineEdit.textChanged.connect(self._meshLocEdited)
         self._ui.pathLocButton.clicked.connect(self._pathLocClicked)
         self._ui.pathLocLineEdit.textChanged.connect(self._pathLocEdited)
+
+    def setWorkflowLocation(self, location):
+        self._workflow_location = location
 
     def accept(self):
         '''
@@ -79,32 +83,18 @@ class ConfigureDialog(QtGui.QDialog):
         # don't have to be valid
         self._ui.buttonBox.button(QDialogButtonBox.Ok).setEnabled(idValid)
 
-        gfLocValid = len(self._ui.gfLocLineEdit.text())>0
-        if gfLocValid:
-            self._ui.gfLocLineEdit.setStyleSheet(DEFAULT_STYLE_SHEET)
-        else:
-            self._ui.gfLocLineEdit.setStyleSheet(INVALID_STYLE_SHEET)
+        gfLocValid = os.path.isfile(os.path.join(self._workflow_location, self._ui.gfLocLineEdit.text()))
+        self._ui.gfLocLineEdit.setStyleSheet(DEFAULT_STYLE_SHEET if gfLocValid else INVALID_STYLE_SHEET)
 
-        ensLocValid = len(self._ui.ensLocLineEdit.text())>0
-        if ensLocValid:
-            self._ui.ensLocLineEdit.setStyleSheet(DEFAULT_STYLE_SHEET)
-        else:
-            self._ui.ensLocLineEdit.setStyleSheet(INVALID_STYLE_SHEET)
+        ensLocValid = os.path.isfile(os.path.join(self._workflow_location, self._ui.ensLocLineEdit.text()))
+        self._ui.ensLocLineEdit.setStyleSheet(DEFAULT_STYLE_SHEET if ensLocValid else INVALID_STYLE_SHEET)
 
-        meshLocValid = len(self._ui.meshLocLineEdit.text())>0
-        if meshLocValid:
-            self._ui.meshLocLineEdit.setStyleSheet(DEFAULT_STYLE_SHEET)
-        else:
-            self._ui.meshLocLineEdit.setStyleSheet(INVALID_STYLE_SHEET)
+        meshLocValid = os.path.isfile(os.path.join(self._workflow_location, self._ui.meshLocLineEdit.text()))
+        self._ui.meshLocLineEdit.setStyleSheet(DEFAULT_STYLE_SHEET if meshLocValid else INVALID_STYLE_SHEET)
 
-        if len(self._ui.pathLocLineEdit.text())>0:
-            pathLocValid = os.path.exists(self._ui.pathLocLineEdit.text())
-        else:
-            pathLocValid = True
-        if pathLocValid:
-            self._ui.pathLocLineEdit.setStyleSheet(DEFAULT_STYLE_SHEET)
-        else:
-            self._ui.pathLocLineEdit.setStyleSheet(INVALID_STYLE_SHEET)
+        path_location = self._ui.pathLocLineEdit.text()
+        pathLocValid = os.path.exists(os.path.join(self._workflow_location,path_location )) if path_location else True
+        self._ui.pathLocLineEdit.setStyleSheet(DEFAULT_STYLE_SHEET if pathLocValid else INVALID_STYLE_SHEET)
 
         valid = idValid and gfLocValid and ensLocValid and meshLocValid and pathLocValid
         # self._ui.buttonBox.button(QDialogButtonBox.Ok).setEnabled(valid)
@@ -148,28 +138,28 @@ class ConfigureDialog(QtGui.QDialog):
         self._ui.pathLocLineEdit.setText(config['path'])
 
     def _gfLocClicked(self):
-        location = QtGui.QFileDialog.getOpenFileName(self, 'Select File Location', self._previousGFLoc)
-        if location[0]:
-            self._previousGFLoc = location[0]
-            self._ui.gfLocLineEdit.setText(location[0])
+        location, _ = QtGui.QFileDialog.getOpenFileName(self, 'Select File Location', self._previousGFLoc)
+        if location:
+            self._previousGFLoc = location
+            self._ui.gfLocLineEdit.setText(os.path.relpath(location, self._workflow_location))
 
     def _gfLocEdited(self):
         self.validate()
 
     def _ensLocClicked(self):
-        location = QtGui.QFileDialog.getOpenFileName(self, 'Select File Location', self._previousEnsLoc)
-        if location[0]:
-            self._previousEnsLoc = location[0]
-            self._ui.ensLocLineEdit.setText(location[0])
+        location, _ = QtGui.QFileDialog.getOpenFileName(self, 'Select File Location', self._previousEnsLoc)
+        if location:
+            self._previousEnsLoc = location
+            self._ui.ensLocLineEdit.setText(os.path.relpath(location, self._workflow_location))
 
     def _ensLocEdited(self):
         self.validate()
 
     def _meshLocClicked(self):
-        location = QtGui.QFileDialog.getOpenFileName(self, 'Select File Location', self._previousMeshLoc)
-        if location[0]:
-            self._previousMeshLoc = location[0]
-            self._ui.meshLocLineEdit.setText(location[0])
+        location, _ = QtGui.QFileDialog.getOpenFileName(self, 'Select File Location', self._previousMeshLoc)
+        if location:
+            self._previousMeshLoc = location
+            self._ui.meshLocLineEdit.setText(os.path.relpath(location, self._workflow_location))
 
     def _meshLocEdited(self):
         self.validate()
@@ -178,7 +168,7 @@ class ConfigureDialog(QtGui.QDialog):
         location = QtGui.QFileDialog.getExistingDirectory(self, 'Select Path Folder', self._previousPathLoc)
         if location:
             self._previousPathLoc = location
-            self._ui.pathLocLineEdit.setText(location)
+            self._ui.pathLocLineEdit.setText(os.path.relpath(location, self._workflow_location))
 
     def _pathLocEdited(self):
         self.validate()
