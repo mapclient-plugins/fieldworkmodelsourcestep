@@ -59,31 +59,31 @@ class FieldworkModelSourceStep(WorkflowStepMountPoint):
         may be connected up to a button in a widget for example.
         '''
         # Put your execute step code here before calling the '_doneExecution' method.
-        if self._GFFilename!=None:
+        if self._GFFilename is not None:
             gfFilename = self._GFFilename
         else:
-            gfFilename = self._config['GF Filename']
+            gfFilename = os.path.join(self._location, self._config['GF Filename'])
 
-        if self._ensFilename!=None:
+        if self._ensFilename is not None:
             ensFilename = self._ensFilename
-        elif self._config['ensemble filename']==None:
+        elif self._config['ensemble filename'] is None:
             ensFilename = None
         else:
-            ensFilename = self._config['ensemble filename']
+            ensFilename = os.path.join(self._location, self._config['ensemble filename'])
 
-        if self._meshFilename!=None:
+        if self._meshFilename is not None:
             meshFilename = self._meshFilename
-        elif self._config['mesh filename']==None:
+        elif self._config['mesh filename'] is None:
             meshFilename = None
         else:
-            meshFilename = self._config['mesh filename']
+            meshFilename = os.path.join(self._location, self._config['mesh filename'])
 
-        if self._path!=None:
+        if self._path is not None:
             path = self._path
-        elif self._config['path']==None:
+        elif self._config['path'] is None:
             path = ''
         else:
-            path = self._config['path']
+            path = os.path.join(self._location, self._config['path'])
 
         self._GF = geometric_field.load_geometric_field(gfFilename, ensFilename, meshFilename, path=path)
         print('GF name:', self._GF.name)
@@ -122,7 +122,8 @@ class FieldworkModelSourceStep(WorkflowStepMountPoint):
         then set:
             self._configured = True
         '''
-        dlg = ConfigureDialog()
+        dlg = ConfigureDialog(QtGui.QApplication.activeWindow().currentWidget())
+        dlg.setWorkflowLocation(self._location)
         dlg.identifierOccursCount = self._identifierOccursCount
         dlg.setConfig(self._config)
         dlg.validate()
@@ -161,6 +162,7 @@ class FieldworkModelSourceStep(WorkflowStepMountPoint):
         self._config.update(json.loads(string))
 
         d = ConfigureDialog()
+        d.setWorkflowLocation(self._location)
         d.identifierOccursCount = self._identifierOccursCount
         d.setConfig(self._config)
         self._configured = d.validate()
