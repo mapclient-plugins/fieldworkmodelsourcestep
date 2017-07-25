@@ -3,6 +3,8 @@ Fieldwork Model Source Step
 
 MAP Client plugin for reading a Fieldwork mesh from file.
 
+Meshes compatible with this plugin can be found at the [MAP Model Collection](https://github.com/juzhang/MAP-Model-Collection).
+
 Requires
 --------
 - GIAS2 : https://bitbucket.org/jangle/gias2
