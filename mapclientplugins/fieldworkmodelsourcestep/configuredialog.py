@@ -1,10 +1,10 @@
-
 import os
 from PySide2 import QtWidgets
 from mapclientplugins.fieldworkmodelsourcestep.ui_configuredialog import Ui_Dialog
 
 INVALID_STYLE_SHEET = 'background-color: rgba(239, 0, 0, 50)'
 DEFAULT_STYLE_SHEET = 'background-color: rgba(255, 255, 255, 50)'
+
 
 class ConfigureDialog(QtWidgets.QDialog):
     '''
@@ -16,7 +16,7 @@ class ConfigureDialog(QtWidgets.QDialog):
         Constructor
         '''
         QtWidgets.QDialog.__init__(self, parent)
-        
+
         self._ui = Ui_Dialog()
         self._ui.setupUi(self)
 
@@ -57,8 +57,9 @@ class ConfigureDialog(QtWidgets.QDialog):
         result = QtWidgets.QMessageBox.Yes
         if not self.validate():
             result = QtWidgets.QMessageBox.warning(self, 'Invalid Configuration',
-                'This configuration is invalid.  Unpredictable behaviour may result if you choose \'Yes\', are you sure you want to save this configuration?)',
-                QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No, QtWidgets.QMessageBox.No)
+                                                   'This configuration is invalid.  Unpredictable behaviour may result if you choose \'Yes\', are you sure you want to save this configuration?)',
+                                                   QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No,
+                                                   QtWidgets.QMessageBox.No)
 
         if result == QtWidgets.QMessageBox.Yes:
             QtWidgets.QDialog.accept(self)
@@ -92,7 +93,7 @@ class ConfigureDialog(QtWidgets.QDialog):
         self._ui.meshLocLineEdit.setStyleSheet(DEFAULT_STYLE_SHEET if meshLocValid else INVALID_STYLE_SHEET)
 
         path_location = self._ui.pathLocLineEdit.text()
-        pathLocValid = os.path.exists(os.path.join(self._workflow_location,path_location )) if path_location else True
+        pathLocValid = os.path.exists(os.path.join(self._workflow_location, path_location)) if path_location else True
         self._ui.pathLocLineEdit.setStyleSheet(DEFAULT_STYLE_SHEET if pathLocValid else INVALID_STYLE_SHEET)
 
         valid = idValid and gfLocValid and ensLocValid and meshLocValid and pathLocValid
