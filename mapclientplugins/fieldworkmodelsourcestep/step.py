@@ -1,16 +1,16 @@
-
 '''
 MAP Client Plugin Step
 '''
 import os
 import json
 
-from PySide import QtGui
+from PySide2 import QtGui, QtWidgets
 
 from mapclient.mountpoints.workflowstep import WorkflowStepMountPoint
 from mapclientplugins.fieldworkmodelsourcestep.configuredialog import ConfigureDialog
 
 from gias2.fieldwork.field import geometric_field
+
 
 class FieldworkModelSourceStep(WorkflowStepMountPoint):
     '''
@@ -19,7 +19,7 @@ class FieldworkModelSourceStep(WorkflowStepMountPoint):
 
     def __init__(self, location):
         super(FieldworkModelSourceStep, self).__init__('Fieldwork Model Source', location)
-        self._configured = False # A step cannot be executed until it has been configured.
+        self._configured = False  # A step cannot be executed until it has been configured.
         self._category = 'Source'
         # Add any other initialisation code here:
         self._icon = QtGui.QImage(':/fieldworkmodelsourcestep/images/fieldworkmodelsourceicon.png')
@@ -45,7 +45,7 @@ class FieldworkModelSourceStep(WorkflowStepMountPoint):
         self._config['ensemble filename'] = ''
         self._config['mesh filename'] = ''
         self._config['path'] = ''
-        
+
         self._GF = None
         self._GFFilename = None
         self._ensFilename = None
@@ -98,11 +98,11 @@ class FieldworkModelSourceStep(WorkflowStepMountPoint):
         '''
 
         if index == 0:
-            self._GFFilename = dataIn # String
+            self._GFFilename = dataIn  # String
         elif index == 1:
-            self._ensFilename = dataIn # String
+            self._ensFilename = dataIn  # String
         elif index == 2:
-            self._meshFilename = dataIn # String
+            self._meshFilename = dataIn  # String
         else:
             self._path = dataIn
 
@@ -112,7 +112,7 @@ class FieldworkModelSourceStep(WorkflowStepMountPoint):
         The index is the index of the port in the port list.  If there is only one
         provides port for this step then the index can be ignored.
         '''
-        return self._GF # ju#fieldworkmodel
+        return self._GF  # ju#fieldworkmodel
 
     def configure(self):
         '''
@@ -122,16 +122,16 @@ class FieldworkModelSourceStep(WorkflowStepMountPoint):
         then set:
             self._configured = True
         '''
-        dlg = ConfigureDialog(QtGui.QApplication.activeWindow().currentWidget())
+        dlg = ConfigureDialog(self._main_window)
         dlg.setWorkflowLocation(self._location)
         dlg.identifierOccursCount = self._identifierOccursCount
         dlg.setConfig(self._config)
         dlg.validate()
         dlg.setModal(True)
-        
+
         if dlg.exec_():
             self._config = dlg.getConfig()
-        
+
         self._configured = dlg.validate()
         self._configuredObserver()
 
@@ -166,5 +166,3 @@ class FieldworkModelSourceStep(WorkflowStepMountPoint):
         d.identifierOccursCount = self._identifierOccursCount
         d.setConfig(self._config)
         self._configured = d.validate()
-
-
