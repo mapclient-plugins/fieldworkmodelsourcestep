@@ -1,5 +1,5 @@
 import os
-from PySide2 import QtWidgets
+from PySide6 import QtWidgets
 from mapclientplugins.fieldworkmodelsourcestep.ui_configuredialog import Ui_Dialog
 
 INVALID_STYLE_SHEET = 'background-color: rgba(239, 0, 0, 50)'
