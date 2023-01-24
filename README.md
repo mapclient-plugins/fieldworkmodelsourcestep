@@ -7,11 +7,11 @@ Meshes compatible with this plugin can be found at the [MAP Model Collection](ht
 
 Requires
 --------
-- GIAS2 : https://bitbucket.org/jangle/gias2
+- GIAS3 - Fieldwork: https://github.com/musculoskeletal/gias3.fieldwork
 
 Inputs
 ------
-- **fieldworkmodel** [GIAS2 GeometricField instance] : The Fieldwork mesh to be serialised.
+- **fieldworkmodel** [GIAS3 GeometricField instance] : The Fieldwork mesh to be serialised.
 - **string** [str] : Path of the .geof file to be read.
 - **string** [str] : Path of the .ens to be read.
 - **string** [str] : Path of the .mesh to be read.
